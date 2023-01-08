@@ -41,36 +41,46 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   // const scheme = useColorScheme();
 
+  function getTabBarIcon(route, focused, color, size) {
+    let iconName:
+      | "search"
+      | "search-outline"
+      | "heart"
+      | "heart-outline"
+      | "ellipsis-horizontal"
+      | "ellipsis-horizontal-outline"
+      | "help-outline" = "help-outline";
+
+    switch (route.name) {
+      case "Search":
+        iconName = focused ? "search" : "search-outline";
+        break;
+      case "Saved":
+        iconName = focused ? "heart" : "heart-outline";
+        break;
+      case "More":
+        iconName = focused
+          ? "ellipsis-horizontal"
+          : "ellipsis-horizontal-outline";
+      default:
+        break;
+    }
+
+    return <Ionicons name={iconName} size={size} color={color} />;
+  }
+
   return (
     <NavigationContainer theme={MyDarkTheme}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-
-            switch (route.name) {
-              case "search":
-                iconName = focused ? "search" : "search-outline";
-                break;
-              case "saved":
-                iconName = focused ? "heart" : "heart-outline";
-                break;
-              case "more":
-                iconName = focused
-                  ? "ellipsis-horizontal"
-                  : "ellipsis-horizontal-outline";
-              default:
-                break;
-            }
-
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
+          tabBarIcon: ({ focused, color, size }) =>
+            getTabBarIcon(route, focused, color, size),
           headerShown: false,
         })}
       >
-        <Tab.Screen name="search" component={SearchScreen} />
-        {/* <Tab.Screen name="saved" component={SavedScreen} /> */}
-        {/* <Tab.Screen name="more" component={MoreScreen} /> */}
+        <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen name="Saved" component={SavedScreen} />
+        <Tab.Screen name="More" component={MoreScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

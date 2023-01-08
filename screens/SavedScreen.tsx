@@ -1,16 +1,14 @@
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { MyStatusBar } from "../components";
 
-export function MoreScreen({ navigation }) {
+export function SavedScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>More</Text>
-      <MyStatusBar />
+      <Text style={styles.text}>Saved</Text>
+      <MyStatusBar style={"light"} />
     </View>
   );
 }
-
-let { height, width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {

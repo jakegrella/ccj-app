@@ -22,10 +22,17 @@ export function SearchScreen() {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-
   const [mappableJobs, setMappableJobs] = useState([]);
   const [mapMarkers, setMapMarkers] = useState([]);
-  const [mapRegion, setMapRegion] = useState(undefined);
+  const [mapRegion, setMapRegion] = useState<
+    | {
+        latitude: number;
+        longitude: number;
+        latitudeDelta: number;
+        longitudeDelta: number;
+      }
+    | undefined
+  >(undefined);
   const [selectedJob, setSelectedJob] = useState(undefined);
   const [showSelectedJob, setShowSelectedJob] = useState(false);
 
@@ -166,7 +173,7 @@ export function SearchScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.interactions}>
-        {showSelectedJob && selectedJob && (
+        {/* {showSelectedJob && selectedJob && (
           <View style={styles.selectedPreview}>
             <View style={styles.selectedPreview_top}>
               <Image
@@ -188,7 +195,7 @@ export function SearchScreen() {
               {selectedJob.company.mission}
             </Text>
           </View>
-        )}
+        )} */}
 
         {/* <View style={styles.search}>
           <TextInput style={styles.searchInput} placeholder="test" />
@@ -214,9 +221,7 @@ export function SearchScreen() {
         onRegionChangeComplete={handleRegionChangeComplete}
         onPress={handleMapPress}
       >
-        {/* <Text> */}
-        {mapMarkers &&
-          mapMarkers.length &&
+        {!!mapMarkers?.length &&
           mapMarkers.map((m) => {
             return (
               <Marker
@@ -237,7 +242,6 @@ export function SearchScreen() {
               </Marker>
             );
           })}
-        {/* </Text> */}
       </MapView>
       <MyStatusBar style={"dark"} />
     </View>
