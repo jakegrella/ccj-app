@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import Constants from "expo-constants";
 import { MyStatusBar } from "../components";
 import * as Location from "expo-location";
 
@@ -16,36 +17,29 @@ let haveUserLocation;
 let mapRegionChangedTimeout;
 
 export function SearchScreen() {
-  const [initMap, setInitMap] = useState({
-    latitude: 40.741895,
-    longitude: -73.989308,
+  const [mappableLocations, setMappableLocations] = useState([]);
+  const [mapRegion, setMapRegion] = useState<{
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  }>({
+    latitude: 37.8,
+    longitude: -122.4,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-  const [mappableJobs, setMappableJobs] = useState([]);
-  const [mapMarkers, setMapMarkers] = useState([]);
-  const [mapRegion, setMapRegion] = useState<
-    | {
-        latitude: number;
-        longitude: number;
-        latitudeDelta: number;
-        longitudeDelta: number;
-      }
-    | undefined
-  >(undefined);
-  const [selectedJob, setSelectedJob] = useState(undefined);
-  const [showSelectedJob, setShowSelectedJob] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<any>(undefined);
+  const [showSelectedLocation, setShowSelectedLocation] = useState(false);
 
-  // on page load
-  // - request user location
-  // - set init map location
+  // on page load, request user location + set map region
   useEffect(() => {
     async function getCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         haveUserLocation = false;
-        // set region to default Manhattan
-        setInitMap({
+        // set region to default SF FiDi
+        setMapRegion({
           latitude: 40.741895,
           longitude: -73.989308,
           latitudeDelta: 0.0922,
@@ -56,7 +50,7 @@ export function SearchScreen() {
 
       let { coords } = await Location.getCurrentPositionAsync({});
       haveUserLocation = true;
-      setInitMap({
+      setMapRegion({
         latitude: coords.latitude,
         longitude: coords.longitude,
         latitudeDelta: 0.0922,
@@ -67,135 +61,93 @@ export function SearchScreen() {
     getCurrentLocation();
   }, []);
 
-  // when map region updates
-  // - fetch + set mappable jobs
+  // when map region updates, fetch + set mappable jobs
   useEffect(() => {
-    async function getMappableJobs() {
+    async function getMappableLocations() {
       if (mapRegion) {
-        const latBound = {
-          min: mapRegion.latitude - mapRegion.latitudeDelta / 2,
-          max: mapRegion.latitude + mapRegion.latitudeDelta / 2,
+        const bounds = {
+          lat_min: (
+            mapRegion.latitude -
+            mapRegion.latitudeDelta / 2
+          ).toString(),
+          lat_max: (
+            mapRegion.latitude +
+            mapRegion.latitudeDelta / 2
+          ).toString(),
+          lng_min: (
+            mapRegion.longitude -
+            mapRegion.longitudeDelta / 2
+          ).toString(),
+          lng_max: (
+            mapRegion.longitude +
+            mapRegion.longitudeDelta / 2
+          ).toString(),
         };
-
-        const lngBound = {
-          min: mapRegion.longitude - mapRegion.longitudeDelta / 2,
-          max: mapRegion.longitude + mapRegion.longitudeDelta / 2,
-        };
-
-        const body = JSON.stringify({
-          latBound,
-          lngBound,
-        });
 
         try {
-          const response = await fetch(
-            `${process.env.API_DEV_URL}/api/jobs/mappable`,
-            {
-              method: "post",
-              headers: {
-                Authorization: "Bearer " + process.env.API_SECRET_KEY,
-                "Content-Type": "application/json",
-              },
-              body,
-            }
-          );
-
-          const data = await response.json();
-
-          setMappableJobs(data);
-        } catch (err) {
-          console.log("err", err);
+          const url = `${Constants.expoConfig?.extra?.API_DEV_URL}/api/locations?lat_min=${bounds.lat_min}&lat_max=${bounds.lat_max}&lng_min=${bounds.lng_min}&lng_max=${bounds.lng_max}`;
+          setMappableLocations(await (await fetch(url)).json());
+        } catch (err: any) {
+          console.log("err", err.message);
         }
       }
     }
-    getMappableJobs();
+    getMappableLocations();
   }, [mapRegion]);
-
-  // when jobs update
-  // - set map markers
-  useEffect(() => {
-    // init markerPositions
-    let markerPositions = [];
-
-    // markerPositions = array of marker locations
-    if (mappableJobs && mappableJobs.length) {
-      mappableJobs.forEach((job) => {
-        job.locations.forEach(({ latitude, longitude }) => {
-          markerPositions.push({
-            position: { latitude, longitude },
-            companyLogo: job.company.logo,
-            jobId: job.id,
-          });
-        });
-      });
-    }
-    // set map markers to array of marker locations
-    setMapMarkers(markerPositions);
-  }, [mappableJobs]);
 
   function handleRegionChangeComplete(region) {
     clearTimeout(mapRegionChangedTimeout);
     mapRegionChangedTimeout = setTimeout(() => {
-      // if (mapRegion) {
       setMapRegion(region);
-      // }
     }, 500);
   }
 
-  function handleMarkerPress(e) {
-    // console.log("marker press");
-    const foundJob = mappableJobs.find(
-      (job) => job.id.toString() === e.nativeEvent.id
-    );
-
-    if (foundJob) {
-      setSelectedJob(foundJob);
-      setShowSelectedJob(true);
-    } else {
-      setShowSelectedJob(false);
-      setSelectedJob(undefined);
-    }
-  }
-
   function handleMapPress({ nativeEvent }) {
-    // console.log("map press", nativeEvent);
+    if (nativeEvent.action && nativeEvent.action === "marker-press") {
+      // marker pressed
+      const foundLocation = mappableLocations.find(
+        (loc: any) => loc.id === nativeEvent.id
+      );
 
-    // if (nativeEvent.action && nativeEvent.action === "marker-press") {
-    // marker not pressed
-    if (!nativeEvent.action) {
-      setShowSelectedJob(false);
-      setSelectedJob(undefined);
+      if (foundLocation) {
+        // matching location found
+        setSelectedLocation(foundLocation);
+        setShowSelectedLocation(true);
+      } else {
+        // no matching location found
+        setShowSelectedLocation(false);
+        setSelectedLocation(undefined);
+      }
+    } else {
+      // marker not pressed
+      setShowSelectedLocation(false);
+      setSelectedLocation(undefined);
     }
   }
-
-  // TODO combine map press and marker press functions
 
   return (
     <View style={styles.container}>
       <View style={styles.interactions}>
-        {/* {showSelectedJob && selectedJob && (
+        {!!showSelectedLocation && !!selectedLocation && (
           <View style={styles.selectedPreview}>
             <View style={styles.selectedPreview_top}>
               <Image
                 style={styles.selectedPreview_logo}
                 source={{
-                  uri: selectedJob.company.logo,
+                  uri: selectedLocation.company.logo,
                 }}
               />
               <View>
                 <Text style={styles.selectedPreview_company}>
-                  {selectedJob.company.name}
-                </Text>
-                <Text style={styles.selectedPreview_title}>
-                  {selectedJob.title}
+                  {selectedLocation.company.name}
                 </Text>
               </View>
             </View>
             <Text style={styles.selectedPreview_description}>
-              {selectedJob.company.mission}
+              {selectedLocation.company.mission}
             </Text>
           </View>
-        )} */}
+        )}
 
         {/* <View style={styles.search}>
           <TextInput style={styles.searchInput} placeholder="test" />
@@ -211,37 +163,38 @@ export function SearchScreen() {
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: initMap.latitude,
-          longitude: initMap.longitude,
-          latitudeDelta: initMap.latitudeDelta,
-          longitudeDelta: initMap.longitudeDelta,
+          latitude: mapRegion.latitude,
+          longitude: mapRegion.longitude,
+          latitudeDelta: mapRegion.latitudeDelta,
+          longitudeDelta: mapRegion.longitudeDelta,
         }}
         maxZoomLevel={14} // zooming too far in with custom map pins breaks map
         showsUserLocation={haveUserLocation} // will fail silently
         onRegionChangeComplete={handleRegionChangeComplete}
         onPress={handleMapPress}
       >
-        {!!mapMarkers?.length &&
-          mapMarkers.map((m) => {
-            return (
+        {!!mappableLocations.length &&
+          mappableLocations.map(
+            (
+              loc: any // need types from web app
+            ) => (
               <Marker
-                key={Math.random()}
+                key={loc.id}
+                identifier={loc.id}
                 coordinate={{
-                  latitude: m.position.latitude,
-                  longitude: m.position.longitude,
+                  latitude: loc.latitude,
+                  longitude: loc.longitude,
                 }}
-                onPress={handleMarkerPress}
-                identifier={m.jobId.toString()}
               >
                 <Image
                   style={styles.tinyLogo}
                   source={{
-                    uri: m.companyLogo,
+                    uri: loc.company.logo,
                   }}
                 />
               </Marker>
-            );
-          })}
+            )
+          )}
       </MapView>
       <MyStatusBar style={"dark"} />
     </View>
