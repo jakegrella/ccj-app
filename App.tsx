@@ -70,18 +70,19 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer theme={MyDarkTheme}>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) =>
-            getTabBarIcon(route, focused, color, size),
-          headerShown: false,
-        })}
-      >
-        <Tab.Screen name="Search" component={SearchScreen} />
-        <Tab.Screen name="Saved" component={SavedScreen} />
-        <Tab.Screen name="More" component={MoreScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <SearchScreen />
+    // <NavigationContainer theme={MyDarkTheme}>
+    //   <Tab.Navigator
+    //     screenOptions={({ route }) => ({
+    //       tabBarIcon: ({ focused, color, size }) =>
+    //         getTabBarIcon(route, focused, color, size),
+    //       headerShown: false,
+    //     })}
+    //   >
+    //     <Tab.Screen name="Search" component={SearchScreen} />
+    //     <Tab.Screen name="Saved" component={SavedScreen} />
+    //     <Tab.Screen name="More" component={MoreScreen} />
+    //   </Tab.Navigator>
+    // </NavigationContainer>
   );
 }

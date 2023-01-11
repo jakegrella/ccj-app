@@ -1,17 +1,36 @@
 import { useEffect, useState } from "react";
 import {
+  Button,
   Dimensions,
   Image,
+  LayoutRectangle,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import Constants from "expo-constants";
 import { MyStatusBar } from "../components";
 import * as Location from "expo-location";
+import Animated, {
+  SlideInDown,
+  SlideOutDown,
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withDecay,
+  withSpring,
+  WithSpringConfig,
+} from "react-native-reanimated";
+import {
+  Gesture,
+  GestureDetector,
+  PanGestureHandler,
+  TapGestureHandler,
+} from "react-native-gesture-handler";
 
 let haveUserLocation;
 let mapRegionChangedTimeout;
@@ -29,8 +48,7 @@ export function SearchScreen() {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-  const [selectedLocation, setSelectedLocation] = useState<any>(undefined);
-  const [showSelectedLocation, setShowSelectedLocation] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(undefined);
 
   // on page load, request user location + set map region
   useEffect(() => {
@@ -102,6 +120,50 @@ export function SearchScreen() {
     }, 500);
   }
 
+  const [viewLayout, setViewLayout] = useState<LayoutRectangle>({
+    height: 100,
+    width: 100,
+    x: 0,
+    y: 0,
+  });
+
+  const locationInfoPreviewHeight = height - viewLayout.height - 100 - 79; // TODO get away from pixels
+  // height is screen height
+  // viewLayout.height is animated.view height
+  // 100 is height of preview section of location info
+  // 79 is tab navigator height
+  console.log("height:", height);
+  console.log("viewLayout.height", viewLayout.height);
+  console.log("locationInfoPreviewHeight", locationInfoPreviewHeight);
+
+  // location info
+  const pressed = useSharedValue(false);
+
+  const startingYPosition = locationInfoPreviewHeight;
+  const y = useSharedValue(startingYPosition);
+
+  // drag gesture
+  const eventHandler = useAnimatedGestureHandler({
+    onStart: (_event, ctx) => {
+      pressed.value = true;
+      ctx.startY = y.value;
+    },
+    onActive: (event, ctx) => {
+      y.value = ctx.startY + event.translationY;
+    },
+    onEnd: (event, ctx) => {
+      pressed.value = false;
+      y.value = ctx.startY + event.translationY;
+    },
+  });
+
+  const uas = useAnimatedStyle(() => {
+    return {
+      backgroundColor: pressed.value ? "#121212" : "#000000",
+      transform: [{ translateY: y.value }],
+    };
+  });
+
   function handleMapPress({ nativeEvent }) {
     if (nativeEvent.action && nativeEvent.action === "marker-press") {
       // marker pressed
@@ -109,57 +171,73 @@ export function SearchScreen() {
         (loc: any) => loc.id === nativeEvent.id
       );
 
-      if (foundLocation) {
-        // matching location found
-        setSelectedLocation(foundLocation);
-        setShowSelectedLocation(true);
-      } else {
-        // no matching location found
-        setShowSelectedLocation(false);
-        setSelectedLocation(undefined);
-      }
-    } else {
-      // marker not pressed
-      setShowSelectedLocation(false);
-      setSelectedLocation(undefined);
+      if (foundLocation) setSelectedLocation(foundLocation); // matching location found
+      return;
     }
+    setSelectedLocation(undefined); // marker not pressed or no matching location found
+    y.value = locationInfoPreviewHeight; // reset location info to display at preview height
+    return;
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.interactions}>
-        {!!showSelectedLocation && !!selectedLocation && (
-          <View style={styles.selectedPreview}>
-            <View style={styles.selectedPreview_top}>
+      {/* search */}
+      <View>
+        <Text>test</Text>
+      </View>
+      {/* location info */}
+      {/* TODO if tap or swipe UP on preview sized card, overlay a full size ScrollView */}
+      {!!selectedLocation && (
+        <PanGestureHandler onGestureEvent={eventHandler}>
+          <Animated.View
+            entering={SlideInDown.duration(200)}
+            exiting={SlideOutDown.duration(200)}
+            style={[styles.locationInfo, uas]}
+            onLayout={(event) => {
+              setViewLayout(event.nativeEvent.layout);
+              console.log("height", event.nativeEvent.layout.height);
+              console.log("y", event.nativeEvent.layout.y);
+            }}
+          >
+            <View style={styles.locationInfo_top}>
               <Image
-                style={styles.selectedPreview_logo}
+                style={styles.locationInfo_logo}
                 source={{
                   uri: selectedLocation.company.logo,
                 }}
               />
               <View>
-                <Text style={styles.selectedPreview_company}>
+                <Text style={styles.locationInfo_company}>
                   {selectedLocation.company.name}
+                </Text>
+                <Text style={styles.locationInfo_company}>
+                  {selectedLocation.jobs.length} Open Jobs
                 </Text>
               </View>
             </View>
-            <Text style={styles.selectedPreview_description}>
+            <Text style={styles.locationInfo_description}>
               {selectedLocation.company.mission}
             </Text>
-          </View>
-        )}
 
-        {/* <View style={styles.search}>
-          <TextInput style={styles.searchInput} placeholder="test" />
-          <Pressable>
-            <Text>Jobs</Text>
-          </Pressable>
-          <Pressable>
-            <Text>Companies</Text>
-          </Pressable>
-        </View> */}
-      </View>
+            {!!selectedLocation.jobs.length && (
+              <View style={styles.locationInfo_jobContainer}>
+                {selectedLocation.jobs.map((job) => (
+                  <View key={job.id} style={styles.locationInfo_job}>
+                    <Text style={styles.locationInfo_job_text}>
+                      {job.title}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </Animated.View>
+        </PanGestureHandler>
+      )}
 
+      {/* status bar */}
+      {/* <MyStatusBar style={"dark"} /> */}
+
+      {/* map */}
       <MapView
         style={styles.map}
         initialRegion={{
@@ -196,7 +274,6 @@ export function SearchScreen() {
             )
           )}
       </MapView>
-      <MyStatusBar style={"dark"} />
     </View>
   );
 }
@@ -208,7 +285,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height,
     width,
-    // backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -219,14 +295,15 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   tinyLogo: {
-    width: 32,
-    height: 32,
+    width: 24,
+    height: 24,
     borderWidth: 2,
-    borderRadius: 20,
+    borderRadius: 12,
     borderColor: "#5c7cff",
   },
   interactions: {
     position: "absolute",
+    top: "auto",
     bottom: 0,
     zIndex: 1,
     width: "100%",
@@ -234,46 +311,45 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  search: {
-    backgroundColor: "#1D1D1F",
-    padding: 8,
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    borderWidth: 2,
-  },
-  searchInput: {
-    borderWidth: 2,
-    flexGrow: 2,
-    height: 32,
-  },
-  selectedPreview: {
-    width: "95%",
-    margin: 8,
+  locationInfo: {
     padding: 16,
-    // display: "flex",
-    // justifyContent: "flex-start",
-    // alignItems: "flex-start",
-    backgroundColor: "#1D1D1F",
+    // height: 400,
+    width: "100%",
+    zIndex: 3,
+    borderTopStartRadius: 20,
+    borderTopEndRadius: 20,
   },
-  selectedPreview_top: {
+  locationInfo_top: {
     display: "flex",
     flexDirection: "row",
     marginBottom: 8,
   },
-  selectedPreview_logo: {
+  locationInfo_logo: {
     width: 48,
     height: 48,
     borderRadius: 10,
     marginRight: 8,
   },
-  selectedPreview_company: {
+  locationInfo_company: {
     color: "#ffffff",
   },
-  selectedPreview_title: {
+  locationInfo_title: {
     color: "#ffffff",
   },
-  selectedPreview_description: {
+  locationInfo_description: {
+    color: "#ffffff",
+  },
+  locationInfo_jobContainer: {
+    marginTop: 16,
+  },
+  locationInfo_job: {
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: "#ffffff",
+    padding: 8,
+    marginVertical: 8,
+  },
+  locationInfo_job_text: {
     color: "#ffffff",
   },
 });
