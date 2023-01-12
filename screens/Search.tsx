@@ -1,22 +1,16 @@
 import { useEffect, useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import Constants from "expo-constants";
-import { MyStatusBar } from "../components";
+import { SelectedLocationHeader } from "../components";
 import * as Location from "expo-location";
+import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
+import { StatusBar } from "expo-status-bar";
 
 let haveUserLocation;
 let mapRegionChangedTimeout;
 
-export function SearchScreen() {
+export function Search({ navigation }) {
   const [mappableLocations, setMappableLocations] = useState([]);
   const [mapRegion, setMapRegion] = useState<{
     latitude: number;
@@ -127,38 +121,20 @@ export function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.interactions}>
-        {!!showSelectedLocation && !!selectedLocation && (
-          <View style={styles.selectedPreview}>
-            <View style={styles.selectedPreview_top}>
-              <Image
-                style={styles.selectedPreview_logo}
-                source={{
-                  uri: selectedLocation.company.logo,
-                }}
-              />
-              <View>
-                <Text style={styles.selectedPreview_company}>
-                  {selectedLocation.company.name}
-                </Text>
-              </View>
-            </View>
-            <Text style={styles.selectedPreview_description}>
-              {selectedLocation.company.mission}
-            </Text>
-          </View>
-        )}
+      <StatusBar style="dark" />
 
-        {/* <View style={styles.search}>
-          <TextInput style={styles.searchInput} placeholder="test" />
-          <Pressable>
-            <Text>Jobs</Text>
-          </Pressable>
-          <Pressable>
-            <Text>Companies</Text>
-          </Pressable>
-        </View> */}
-      </View>
+      {!!showSelectedLocation && !!selectedLocation && (
+        <Animated.View
+          entering={SlideInDown}
+          exiting={SlideOutDown}
+          style={styles.selectedLocation}
+          onTouchEnd={() => {
+            navigation.navigate("Selected Location", { selectedLocation });
+          }}
+        >
+          <SelectedLocationHeader selectedLocation={selectedLocation} />
+        </Animated.View>
+      )}
 
       <MapView
         style={styles.map}
@@ -196,7 +172,6 @@ export function SearchScreen() {
             )
           )}
       </MapView>
-      <MyStatusBar style={"dark"} />
     </View>
   );
 }
@@ -208,7 +183,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height,
     width,
-    // backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -225,11 +199,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderColor: "#5c7cff",
   },
-  interactions: {
+  selectedLocation: {
     position: "absolute",
     bottom: 0,
     zIndex: 1,
-    width: "100%",
+    width: "95%",
+    margin: 8,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -246,34 +221,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     flexGrow: 2,
     height: 32,
-  },
-  selectedPreview: {
-    width: "95%",
-    margin: 8,
-    padding: 16,
-    // display: "flex",
-    // justifyContent: "flex-start",
-    // alignItems: "flex-start",
-    backgroundColor: "#1D1D1F",
-  },
-  selectedPreview_top: {
-    display: "flex",
-    flexDirection: "row",
-    marginBottom: 8,
-  },
-  selectedPreview_logo: {
-    width: 48,
-    height: 48,
-    borderRadius: 10,
-    marginRight: 8,
-  },
-  selectedPreview_company: {
-    color: "#ffffff",
-  },
-  selectedPreview_title: {
-    color: "#ffffff",
-  },
-  selectedPreview_description: {
-    color: "#ffffff",
   },
 });
