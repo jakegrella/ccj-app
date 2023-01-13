@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 
-export function SelectedJob({ navigation, route }) {
+export function SelectedJob({ route }) {
   const { job } = route.params;
 
   return (

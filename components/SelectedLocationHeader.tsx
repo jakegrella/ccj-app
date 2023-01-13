@@ -1,56 +1,84 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 
 export function SelectedLocationHeader({ selectedLocation }) {
   return (
-    <View style={styles.selectedLocation}>
-      <View style={styles.selectedLocation_top}>
+    <View style={styles.header}>
+      <View style={styles.header_left}>
         <Image
-          style={styles.selectedLocation_logo}
+          style={styles.header_left_logo}
           source={{
             uri: selectedLocation.company.logo,
           }}
         />
-        <View>
-          <Text style={styles.selectedLocation_company}>
+        <View style={styles.test}>
+          <Text style={styles.header_left_companyName}>
             {selectedLocation.company.name}
           </Text>
-          <Text style={styles.selectedLocation_description}>
+          <Text style={styles.header_left_companyDescription}>
             {selectedLocation.company.mission}
           </Text>
         </View>
       </View>
-      <Text style={styles.selectedLocation_description}>
-        {selectedLocation.jobs.length} Open Jobs
-      </Text>
+      <View style={styles.header_jobCount}>
+        <Text style={styles.header_jobCount_text}>
+          {selectedLocation.jobs.length}
+        </Text>
+      </View>
     </View>
   );
 }
 
+let { width } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
-  selectedLocation: {
+  header: {
     width: "100%",
-    padding: 16,
+    padding: 12,
     backgroundColor: "#1D1D1F",
     borderRadius: 8,
-  },
-  selectedLocation_top: {
     display: "flex",
     flexDirection: "row",
-    marginBottom: 8,
+    flexWrap: "nowrap",
+    justifyContent: "space-between",
+    alignItems: "center",
+    maxWidth: width,
   },
-  selectedLocation_logo: {
+  header_left: {
+    flexDirection: "row",
+    marginRight: 8,
+    overflow: "hidden",
+  },
+  header_left_logo: {
     width: 48,
     height: 48,
-    borderRadius: 10,
+    borderRadius: 8,
     marginRight: 8,
   },
-  selectedLocation_company: {
-    color: "#ffffff",
+  test: {
+    width: "70%",
   },
-  selectedLocation_title: {
+  header_left_companyName: {
     color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "700",
   },
-  selectedLocation_description: {
+  header_left_companyDescription: {
     color: "#ffffff",
+    flexWrap: "wrap",
+  },
+  header_jobCount: {
+    height: 40,
+    width: 40,
+    borderColor: "#ffffff",
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  header_jobCount_text: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "700",
   },
 });

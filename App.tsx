@@ -20,7 +20,10 @@ export default function App() {
 
   return (
     <NavigationContainer theme={Dark}>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{ headerTitle: "" }}
+      >
         <Stack.Screen
           name="Home"
           component={Home}
