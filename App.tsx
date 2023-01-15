@@ -1,17 +1,18 @@
 import { DarkTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Home, SelectedJob, SelectedLocation } from "./screens";
+import { colors } from "./utils";
 
 const Dark = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
-    text: "#FFFFFF",
-    primary: "#0171e3",
-    background: "#000000",
-    card: "#000000",
-    border: "#000000",
-    notification: "#000000",
+    text: colors.white,
+    primary: colors.primary,
+    background: colors.black,
+    card: colors.black,
+    border: colors.black,
+    notification: colors.black,
   },
 };
 
