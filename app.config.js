@@ -5,11 +5,11 @@ module.exports = {
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
-    userInterfaceStyle: "light",
+    userInterfaceStyle: "dark",
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#000000",
     },
     updates: {
       fallbackToCacheTimeout: 0,
@@ -21,13 +21,16 @@ module.exports = {
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#ffffff",
       },
     },
     web: {
       favicon: "./assets/favicon.png",
     },
     extra: {
+      eas: {
+        projectId: "95438394-52ce-4c9d-aeb8-328b7b192cba",
+      },
       API_URL: "https://cloudcomputingjobs.com",
     },
   },
