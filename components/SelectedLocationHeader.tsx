@@ -1,4 +1,5 @@
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import { colors } from "../utils";
 
 export function SelectedLocationHeader({ selectedLocation }) {
   return (
@@ -10,11 +11,11 @@ export function SelectedLocationHeader({ selectedLocation }) {
             uri: selectedLocation.company.logo,
           }}
         />
-        <View style={styles.test}>
-          <Text style={styles.header_left_companyName}>
+        <View style={styles.header_left_words}>
+          <Text style={styles.header_left_words_companyName}>
             {selectedLocation.company.name}
           </Text>
-          <Text style={styles.header_left_companyDescription}>
+          <Text style={styles.header_left_words_companyDescription}>
             {selectedLocation.company.mission}
           </Text>
         </View>
@@ -33,8 +34,8 @@ let { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   header: {
     width: "100%",
-    padding: 12,
-    backgroundColor: "#1D1D1F",
+    padding: 8,
+    backgroundColor: colors.black,
     borderRadius: 8,
     display: "flex",
     flexDirection: "row",
@@ -54,22 +55,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 8,
   },
-  test: {
+  header_left_words: {
     width: "70%",
   },
-  header_left_companyName: {
-    color: "#ffffff",
-    fontSize: 16,
+  header_left_words_companyName: {
+    color: colors.white,
+    fontSize: 18,
     fontWeight: "700",
   },
-  header_left_companyDescription: {
-    color: "#ffffff",
+  header_left_words_companyDescription: {
+    color: colors.white,
     flexWrap: "wrap",
   },
   header_jobCount: {
     height: 40,
     width: 40,
-    borderColor: "#ffffff",
+    borderColor: colors.white,
     borderWidth: 1,
     borderRadius: 8,
     padding: 8,
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header_jobCount_text: {
-    color: "#ffffff",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "700",
   },
