@@ -28,8 +28,7 @@ module.exports = {
       favicon: "./assets/favicon.png",
     },
     extra: {
-      API_DEV_URL:
-        "https://cloud-computing-jobs-or13bz34x-jakegrella.vercel.app",
+      API_URL: "https://cloudcomputingjobs.com",
     },
   },
 };

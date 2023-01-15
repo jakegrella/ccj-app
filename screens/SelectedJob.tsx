@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 18,
   },
-  job_company: {},
+  job_company: { color: colors.white },
   section: { marginVertical: 4 },
   section_title: {
     color: colors.white,

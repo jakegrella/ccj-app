@@ -15,7 +15,7 @@ export function SelectedLocation({ navigation, route }) {
     async function getCompany() {
       if (selectedLocation) {
         try {
-          const url = `${Constants.expoConfig?.extra?.API_DEV_URL}/api/companies/${selectedLocation.company.username}`;
+          const url = `${Constants.expoConfig?.extra?.API_URL}/api/companies/${selectedLocation.company.username}`;
           setCompany(await (await fetch(url)).json());
           return;
         } catch (err: any) {

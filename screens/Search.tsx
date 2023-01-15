@@ -79,7 +79,7 @@ export function Search({ navigation }) {
         };
 
         try {
-          const url = `${Constants.expoConfig?.extra?.API_DEV_URL}/api/locations?lat_min=${bounds.lat_min}&lat_max=${bounds.lat_max}&lng_min=${bounds.lng_min}&lng_max=${bounds.lng_max}`;
+          const url = `${Constants.expoConfig?.extra?.API_URL}/api/locations?lat_min=${bounds.lat_min}&lat_max=${bounds.lat_max}&lng_min=${bounds.lng_min}&lng_max=${bounds.lng_max}`;
           setMappableLocations(await (await fetch(url)).json());
         } catch (err: any) {
           console.log("err", err.message);
