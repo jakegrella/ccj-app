@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SelectedLocationHeader } from "../components";
@@ -28,8 +27,6 @@ export function SelectedLocation({ navigation, route }) {
 
   return (
     <View style={styles.selectedLocation}>
-      <StatusBar style="light" />
-
       <SelectedLocationHeader selectedLocation={selectedLocation} />
 
       {/* jobs */}

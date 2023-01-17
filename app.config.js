@@ -1,6 +1,7 @@
 module.exports = {
   expo: {
-    name: "ccj-app",
+    name: "Cloud Computing Jobs",
+    description: "Explore companies and engineering jobs",
     slug: "ccj-app",
     version: "1.0.0",
     orientation: "portrait",
@@ -17,6 +18,11 @@ module.exports = {
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "com.cloudcomputingjobs.mobile",
+      infoPlist: {
+        NSLocationWhenInUseUsageDescription:
+          "Turning on location services allows us to show companies and jobs in your area.",
+      },
     },
     android: {
       adaptiveIcon: {

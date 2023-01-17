@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { colors } from "../utils";
 import * as Linking from "expo-linking";
@@ -25,45 +24,41 @@ export function SelectedJob({ route }) {
   const { job } = route.params;
 
   return (
-    <View>
-      <StatusBar style="light" />
+    <View style={styles.job}>
+      <Text style={styles.job_title}>{job.title}</Text>
+      <Text style={styles.job_company}>at {job.company.name}</Text>
 
-      <View style={styles.job}>
-        <Text style={styles.job_title}>{job.title}</Text>
-        <Text style={styles.job_company}>at {job.company.name}</Text>
-
-        <View style={styles.section}>
-          <Text style={styles.job_quickInfo_title}>Quick Info</Text>
-          <QuickInfoSection
-            title="Posted:"
-            data={job.datePublished || "Unpublished"}
-          />
-          <QuickInfoSection title="Type:" data={job.type} />
-          <QuickInfoSection title="Experience:" data={job.experience} />
-          {/* <QuickInfoSection title="Pay" data={job.pay} /> */}
-          {/* <QuickInfoSection title="Equity" data={job.equity} /> */}
-          {/* locations */}
-        </View>
-
-        {!!job.description && (
-          <Section title="Description" data={job.description} />
-        )}
-
-        {!!job.responsibilities && (
-          <Section title="Responsibilities" data={job.responsibilities} />
-        )}
-
-        {!!job.qualifications && (
-          <Section title="Qualifications" data={job.qualifications} />
-        )}
-
-        <Button
-          title={`Apply at ${job.company.name}`}
-          onPress={() => {
-            Linking.openURL(job.posting);
-          }}
+      <View style={styles.section}>
+        <Text style={styles.job_quickInfo_title}>Quick Info</Text>
+        <QuickInfoSection
+          title="Posted:"
+          data={job.datePublished || "Unpublished"}
         />
+        <QuickInfoSection title="Type:" data={job.type} />
+        <QuickInfoSection title="Experience:" data={job.experience} />
+        {/* <QuickInfoSection title="Pay" data={job.pay} /> */}
+        {/* <QuickInfoSection title="Equity" data={job.equity} /> */}
+        {/* locations */}
       </View>
+
+      {!!job.description && (
+        <Section title="Description" data={job.description} />
+      )}
+
+      {!!job.responsibilities && (
+        <Section title="Responsibilities" data={job.responsibilities} />
+      )}
+
+      {!!job.qualifications && (
+        <Section title="Qualifications" data={job.qualifications} />
+      )}
+
+      <Button
+        title={`Apply at ${job.company.name}`}
+        onPress={() => {
+          Linking.openURL(job.posting);
+        }}
+      />
     </View>
   );
 }

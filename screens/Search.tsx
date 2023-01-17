@@ -28,7 +28,7 @@ export function Search({ navigation }) {
 
   // on page load, request user location + set map region
   useEffect(() => {
-    async function getCurrentLocation() {
+    (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         haveUserLocation = false;
@@ -51,8 +51,7 @@ export function Search({ navigation }) {
         longitudeDelta: 0.0421,
       });
       return;
-    }
-    getCurrentLocation();
+    })();
   }, []);
 
   // when map region updates, fetch + set mappable jobs
@@ -121,7 +120,7 @@ export function Search({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       {!!showSelectedLocation && !!selectedLocation && (
         <Animated.View
