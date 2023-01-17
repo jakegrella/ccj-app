@@ -23,7 +23,7 @@ export default function App() {
     <NavigationContainer theme={Dark}>
       <Stack.Navigator
         initialRouteName="Home"
-        screenOptions={{ headerTitle: "" }}
+        screenOptions={{ headerTitle: "", headerShadowVisible: false }}
       >
         <Stack.Screen
           name="Home"

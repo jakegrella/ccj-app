@@ -1,15 +1,16 @@
 module.exports = {
   expo: {
-    name: "ccj-app",
+    name: "Cloud Computing Jobs",
+    description: "Explore companies and engineering jobs",
     slug: "ccj-app",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
-    userInterfaceStyle: "light",
+    userInterfaceStyle: "dark",
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#000000",
     },
     updates: {
       fallbackToCacheTimeout: 0,
@@ -17,19 +18,26 @@ module.exports = {
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "com.cloudcomputingjobs.mobile",
+      infoPlist: {
+        NSLocationWhenInUseUsageDescription:
+          "Turning on location services allows us to show companies and jobs in your area.",
+      },
     },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#ffffff",
       },
     },
     web: {
       favicon: "./assets/favicon.png",
     },
     extra: {
-      API_DEV_URL:
-        "https://cloud-computing-jobs-or13bz34x-jakegrella.vercel.app",
+      eas: {
+        projectId: "95438394-52ce-4c9d-aeb8-328b7b192cba",
+      },
+      API_URL: "https://cloudcomputingjobs.com",
     },
   },
 };

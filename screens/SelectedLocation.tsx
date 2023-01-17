@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SelectedLocationHeader } from "../components";
@@ -15,7 +14,7 @@ export function SelectedLocation({ navigation, route }) {
     async function getCompany() {
       if (selectedLocation) {
         try {
-          const url = `${Constants.expoConfig?.extra?.API_DEV_URL}/api/companies/${selectedLocation.company.username}`;
+          const url = `${Constants.expoConfig?.extra?.API_URL}/api/companies/${selectedLocation.company.username}`;
           setCompany(await (await fetch(url)).json());
           return;
         } catch (err: any) {
@@ -28,8 +27,6 @@ export function SelectedLocation({ navigation, route }) {
 
   return (
     <View style={styles.selectedLocation}>
-      <StatusBar style="light" />
-
       <SelectedLocationHeader selectedLocation={selectedLocation} />
 
       {/* jobs */}
