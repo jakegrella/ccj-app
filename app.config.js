@@ -3,7 +3,7 @@ module.exports = {
     name: "Cloud Computing Jobs",
     description: "Explore companies and engineering jobs",
     slug: "ccj-app",
-    version: "1.0.0",
+    version: "1.0.1",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "dark",
